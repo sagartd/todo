@@ -1,4 +1,11 @@
-const Confirm = ({ setIsRemoveAllConfirm, setTaskList }) => {
+// import { Task } from "./todoHome";
+
+// type RemoveAll = {
+//   setIsRemoveAllConfirm: boolean;
+//   setTaskList: Task;
+// };
+
+const Confirm = ({ setIsRemoveAllConfirm, setTaskList }: any) => {
   return (
     <div className="confirm-container">
       <div className="confirm-main">

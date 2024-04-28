@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import Tasck from "./task";
 import Confirm from "./confirm";
 
-interface Task {
+export interface Task {
   id: number;
-  isChecked: Boolean;
+  isChecked: boolean;
   task: string;
-  isTaskInputComplete: Boolean;
+  isTaskInputComplete: boolean;
 }
 
 const emptyTask: Task = {
