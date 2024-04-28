@@ -1,0 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&family=Hachi+Maru+Pop&display=swap");
+
+:root {
+  font-family: "Assistant", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+@media (max-width: 750px) {
+  body {
+    align-items: flex-start;
+  }
+}
