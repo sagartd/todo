@@ -1,11 +1,7 @@
-// import { Task } from "./todoHome";
+import { TodoContextConsumer } from "./store/store";
 
-// type RemoveAll = {
-//   setIsRemoveAllConfirm: boolean;
-//   setTaskList: Task;
-// };
-
-const Confirm = ({ setIsRemoveAllConfirm, setTaskList }: any) => {
+const Confirm = () => {
+  const { dispatch, setIsRemoveAllConfirm } = TodoContextConsumer();
   return (
     <div className="confirm-container">
       <div className="confirm-main">
@@ -14,15 +10,7 @@ const Confirm = ({ setIsRemoveAllConfirm, setTaskList }: any) => {
           <button
             className="btn-task-allComplete"
             onClick={() => {
-              setTaskList([
-                {
-                  id: Math.floor(Math.random() * 10000),
-                  isChecked: false,
-                  task: "",
-                  isTaskInputComplete: false,
-                },
-              ]),
-                setIsRemoveAllConfirm(false);
+              dispatch({ type: "REMOVE_ALL_TASK" }), setIsRemoveAllConfirm(false);
             }}
           >
             Yes
@@ -40,3 +28,4 @@ const Confirm = ({ setIsRemoveAllConfirm, setTaskList }: any) => {
 };
 
 export default Confirm;
+

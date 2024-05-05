@@ -1,85 +1,18 @@
-import { useEffect, useState } from "react";
 import Tasck from "./task";
+import { TodoContextConsumer } from "./store/store";
 import Confirm from "./confirm";
 
-export interface Task {
-  id: number;
-  isChecked: boolean;
-  task: string;
-  isTaskInputComplete: boolean;
-}
-
-const emptyTask: Task = {
-  id: Math.floor(Math.random() * 10000),
-  isChecked: false,
-  task: "",
-  isTaskInputComplete: false,
-};
-
 const TodoHome = () => {
-  const [taskList, setTaskList] = useState<Task[]>([emptyTask]);
-  const [isAllChecked, setIsAllCheked] = useState(false);
-  const [isRemoveAllConfirm, setIsRemoveAllConfirm] = useState(false);
-
-  // console.log({ isAllChecked, taskList });
-
-  const addNewTask = () => {
-    const newID: number = Math.floor(Math.random() * 10000);
-    setTaskList([...taskList, { ...emptyTask, id: newID }]);
-  };
-
-  const taskInput = (id: number, value: any) => {
-    setTaskList(
-      taskList.map((e) => (e.id === id ? { ...e, task: value } : { ...e }))
-    );
-  };
-
-  const checkboxInput = (id: number, value: any) => {
-    setTaskList(
-      taskList.map((e) => (e.id === id ? { ...e, isChecked: value } : { ...e }))
-    );
-  };
-
-  const allChecked = () => {
-    setTaskList(
-      taskList.map((e) =>
-        e.isTaskInputComplete ? { ...e, isChecked: true } : { ...e }
-      )
-    );
-  };
-
-  const validateInput = (id: number) => {
-    setTaskList(
-      taskList.map((e) =>
-        e.id === id
-          ? {
-              ...e,
-              isTaskInputComplete: !e.isTaskInputComplete,
-              isChecked: false,
-            }
-          : { ...e }
-      )
-    );
-  };
-
-  const removeOneTask = (id: number): any => {
-    taskList.length > 1
-      ? setTaskList(taskList.filter((elm) => elm.id !== id))
-      : setTaskList([emptyTask]);
-  };
-
-  useEffect(() => {
-    const checkChecking = taskList.some((e) => e.isChecked === false);
-    setIsAllCheked(!checkChecking);
-  }, [taskList]);
+  const {
+    taskListState,
+    dispatch,
+    isAllChecked,
+    isRemoveAllConfirm,
+    setIsRemoveAllConfirm,
+  } = TodoContextConsumer();
 
   if (isRemoveAllConfirm) {
-    return (
-      <Confirm
-        setIsRemoveAllConfirm={setIsRemoveAllConfirm}
-        setTaskList={setTaskList}
-      />
-    );
+    return <Confirm />;
   } else {
     return (
       <div className="top-parent-container">
@@ -87,30 +20,23 @@ const TodoHome = () => {
           <h1>My TODO List</h1>
         </div>
         <div className="task-list-container">
-          {taskList.map((elm) => (
-            <Tasck
-              key={elm.id}
-              {...elm}
-              removeOneTask={removeOneTask}
-              taskInput={taskInput}
-              checkboxInput={checkboxInput}
-              validateInput={validateInput}
-              taskListLenght={taskList.length > 1}
-            />
+          {taskListState.map((elm: any) => (
+            <Tasck key={elm.id} {...elm} />
           ))}
         </div>
+
         <div className="title todo-footer">
           <button
             className={
-              taskList.length > 0 &&
-              !taskList[taskList.length - 1].isTaskInputComplete
+              taskListState.length > 0 &&
+              !taskListState[taskListState.length - 1].isTaskInputComplete
                 ? "btn-new-task disabled"
                 : "btn-new-task"
             }
-            onClick={() => addNewTask()}
+            onClick={() => dispatch({ type: "ADD_NEW_TASK" })}
             disabled={
-              taskList.length > 0 &&
-              !taskList[taskList.length - 1].isTaskInputComplete
+              taskListState.length > 0 &&
+              !taskListState[taskListState.length - 1].isTaskInputComplete
             }
           >
             <img src="v-icon.svg" alt="new task" />
@@ -118,12 +44,14 @@ const TodoHome = () => {
           {!isAllChecked ? (
             <button
               className={
-                !taskList[taskList.length - 1].isTaskInputComplete
+                !taskListState[taskListState.length - 1].isTaskInputComplete
                   ? "btn-task-allComplete disabled"
                   : "btn-task-allComplete"
               }
-              disabled={!taskList[taskList.length - 1].isTaskInputComplete}
-              onClick={() => allChecked()}
+              disabled={
+                !taskListState[taskListState.length - 1].isTaskInputComplete
+              }
+              onClick={() => dispatch({ type: "SELECT_ALL_TASK" })}
             >
               All Completed
             </button>
@@ -131,7 +59,6 @@ const TodoHome = () => {
             <button
               className="btn-task-allRemove"
               onClick={() => setIsRemoveAllConfirm(true)}
-              // onClick={() => setTaskList([emptyTask])}
             >
               Remove All
             </button>

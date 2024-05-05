@@ -1,38 +1,28 @@
+import { TodoContextConsumer } from "./store/store";
+
 interface Taskprop {
   id: number;
-  removeOneTask: any;
   task: string;
-  taskInput: any;
-  checkboxInput: any;
   isChecked: boolean;
   isTaskInputComplete: boolean;
-  validateInput: any;
-  taskListLenght: any;
 }
 
 const Tasck = (elm: Taskprop) => {
-  const {
-    id,
-    removeOneTask,
-    task,
-    taskInput,
-    checkboxInput,
-    isChecked,
-    isTaskInputComplete,
-    validateInput,
-    taskListLenght,
-  } = elm;
+  const { id, task, isChecked, isTaskInputComplete } = elm;
+
+  const { dispatch, taskListLenght } = TodoContextConsumer();
 
   return (
-    <div className={isChecked && task.length > 2 ? "whenCheked task" : "task"}>
+    <div className={isChecked && task.length > 1 ? "whenCheked task" : "task"}>
       <label className="checkbox-container">
         <input
           type="checkbox"
           checked={isChecked}
           disabled={!isTaskInputComplete}
-          onChange={(e) => checkboxInput(id, e.target.checked)}
+          readOnly
+          onChange={() => dispatch({ type: "SINGLE_CHECKED", payload: id })}
         />
-        {isChecked && task.length > 2 ? (
+        {isChecked && task.length > 1 ? (
           <img
             className="checkbox-icon"
             src="checked.svg"
@@ -41,7 +31,7 @@ const Tasck = (elm: Taskprop) => {
         ) : (
           <img
             className={
-              isTaskInputComplete && task.length > 2
+              isTaskInputComplete && task.length > 1
                 ? "checkbox-icon"
                 : "checkbox-icon disabled"
             }
@@ -60,24 +50,37 @@ const Tasck = (elm: Taskprop) => {
           id=""
           placeholder="write your task"
           value={task}
-          onChange={(e) => taskInput(id, e.target.value)}
-          onKeyDown={(e) =>
-            task.length > 2 && e.key === "Enter" && validateInput(id)
+          onChange={(e) =>
+            dispatch({
+              type: "TASK_INPUT",
+              id: id,
+              value: e.target.value,
+            })
           }
-          onBlur={() => task.length > 2 && validateInput(id)}
+          onKeyDown={(e) =>
+            task.length > 1 &&
+            e.key === "Enter" &&
+            dispatch({ type: "VALIDATE_TASK", payload: id })
+          }
+          onBlur={() =>
+            task.length > 1 && dispatch({ type: "VALIDATE_TASK", payload: id })
+          }
         />
       )}
 
       <div className="btn-group">
         {isTaskInputComplete ? (
-          <button className="btn-task" onClick={() => validateInput(id)}>
+          <button
+            className="btn-task"
+            onClick={() => dispatch({ type: "VALIDATE_TASK", payload: id })}
+          >
             <img src="edit.svg" alt="edit task" />
           </button>
         ) : (
           <button
-            className={task.length < 3 ? "btn-task disabled" : "btn-task"}
-            disabled={task.length < 3}
-            onClick={() => validateInput(id)}
+            className={task.length < 2 ? "btn-task disabled" : "btn-task"}
+            disabled={task.length < 2}
+            onClick={() => dispatch({ type: "VALIDATE_TASK", payload: id })}
           >
             <img src="confirm.svg" alt="confirm task" />
           </button>
@@ -90,7 +93,7 @@ const Tasck = (elm: Taskprop) => {
               : "btn-task "
           }
           disabled={!taskListLenght && !isTaskInputComplete}
-          onClick={() => removeOneTask(id)}
+          onClick={() => dispatch({ type: "SINGLE_REMOVED", payload: id })}
         >
           <img src="remove.svg" alt="remove task" />
         </button>
