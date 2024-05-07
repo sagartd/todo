@@ -1,16 +1,20 @@
-import { TodoContextConsumer } from "./store/store";
+import { TodoContextType, useTodoContextConsumer } from "./store/store";
 
-interface Taskprop {
+interface TaskProp {
   id: number;
   task: string;
   isChecked: boolean;
   isTaskInputComplete: boolean;
 }
 
-const Tasck = (elm: Taskprop) => {
-  const { id, task, isChecked, isTaskInputComplete } = elm;
-
-  const { dispatch, taskListLenght } = TodoContextConsumer();
+const Tasck: React.FC<TaskProp> = ({
+  id,
+  task,
+  isChecked,
+  isTaskInputComplete,
+}) => {
+  const { dispatch, taskListLength }: TodoContextType =
+    useTodoContextConsumer();
 
   return (
     <div className={isChecked && task.length > 1 ? "whenCheked task" : "task"}>
@@ -50,13 +54,14 @@ const Tasck = (elm: Taskprop) => {
           id=""
           placeholder="write your task"
           value={task}
-          onChange={(e) =>
-            dispatch({
-              type: "TASK_INPUT",
-              id: id,
-              value: e.target.value,
-            })
-          }
+          onChange={(e) => {
+            e.preventDefault,
+              dispatch({
+                type: "TASK_INPUT",
+                id: id,
+                value: e.target.value,
+              });
+          }}
           onKeyDown={(e) =>
             task.length > 1 &&
             e.key === "Enter" &&
@@ -88,11 +93,11 @@ const Tasck = (elm: Taskprop) => {
 
         <button
           className={
-            !taskListLenght && !isTaskInputComplete
+            !taskListLength && !isTaskInputComplete
               ? "btn-task disabled"
               : "btn-task "
           }
-          disabled={!taskListLenght && !isTaskInputComplete}
+          disabled={!taskListLength && !isTaskInputComplete}
           onClick={() => dispatch({ type: "SINGLE_REMOVED", payload: id })}
         >
           <img src="remove.svg" alt="remove task" />

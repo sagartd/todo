@@ -1,7 +1,8 @@
-import { TodoContextConsumer } from "./store/store";
+import { TodoContextType, useTodoContextConsumer } from "./store/store";
 
 const Confirm = () => {
-  const { dispatch, setIsRemoveAllConfirm } = TodoContextConsumer();
+  const { dispatch, setIsRemoveAllConfirm }: TodoContextType =
+    useTodoContextConsumer();
   return (
     <div className="confirm-container">
       <div className="confirm-main">
@@ -10,7 +11,8 @@ const Confirm = () => {
           <button
             className="btn-task-allComplete"
             onClick={() => {
-              dispatch({ type: "REMOVE_ALL_TASK" }), setIsRemoveAllConfirm(false);
+              dispatch({ type: "REMOVE_ALL_TASK" }),
+                setIsRemoveAllConfirm(false);
             }}
           >
             Yes
@@ -28,4 +30,3 @@ const Confirm = () => {
 };
 
 export default Confirm;
-

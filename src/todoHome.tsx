@@ -1,6 +1,7 @@
 import Tasck from "./task";
-import { TodoContextConsumer } from "./store/store";
+import { Task, TodoContextType, useTodoContextConsumer } from "./store/store";
 import Confirm from "./confirm";
+
 
 const TodoHome = () => {
   const {
@@ -9,7 +10,7 @@ const TodoHome = () => {
     isAllChecked,
     isRemoveAllConfirm,
     setIsRemoveAllConfirm,
-  } = TodoContextConsumer();
+  }: TodoContextType = useTodoContextConsumer();
 
   if (isRemoveAllConfirm) {
     return <Confirm />;
@@ -20,7 +21,7 @@ const TodoHome = () => {
           <h1>My TODO List</h1>
         </div>
         <div className="task-list-container">
-          {taskListState.map((elm: any) => (
+          {taskListState.map((elm: Task) => (
             <Tasck key={elm.id} {...elm} />
           ))}
         </div>

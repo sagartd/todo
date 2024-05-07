@@ -4,15 +4,31 @@ import {
   useEffect,
   useReducer,
   useState,
+  ReactNode,
 } from "react";
 
-const TodoContext = createContext();
 export interface Task {
   id: number;
   isChecked: boolean;
   task: string;
   isTaskInputComplete: boolean;
 }
+
+interface TodoState {
+  taskListState: Task[];
+  isAllChecked: boolean;
+  isRemoveAllConfirm: boolean;
+  taskListLength: boolean;
+}
+
+export type TodoAction =
+  | { type: "ADD_NEW_TASK" }
+  | { type: "SELECT_ALL_TASK" }
+  | { type: "REMOVE_ALL_TASK" }
+  | { type: "TASK_INPUT"; id: number; value: string }
+  | { type: "VALIDATE_TASK"; payload: number }
+  | { type: "SINGLE_CHECKED"; payload: number }
+  | { type: "SINGLE_REMOVED"; payload: number };
 
 const emptyTask: Task = {
   id: Math.floor(Math.random() * 10000),
@@ -21,7 +37,7 @@ const emptyTask: Task = {
   isTaskInputComplete: false,
 };
 
-const reduce = (currentState, action) => {
+const reducer = (currentState: Task[], action: TodoAction): Task[] => {
   switch (action.type) {
     case "ADD_NEW_TASK":
       const newID: number = Math.floor(Math.random() * 10000);
@@ -31,14 +47,9 @@ const reduce = (currentState, action) => {
     case "REMOVE_ALL_TASK":
       return [{ ...emptyTask }];
     case "TASK_INPUT":
-      return currentState.map((e) => {
-        return e.id === action.id
-          ? {
-              ...e,
-              task: action.value,
-            }
-          : e;
-      });
+      return currentState.map((e) =>
+        e.id === action.id ? { ...e, task: action.value } : e
+      );
     case "VALIDATE_TASK":
       return currentState.map((e) =>
         e.id === action.payload
@@ -49,59 +60,62 @@ const reduce = (currentState, action) => {
             }
           : { ...e }
       );
-
     case "SINGLE_CHECKED":
       return currentState.map((e) =>
-        e.id === action.payload
-          ? {
-              ...e,
-              isChecked: !e.isChecked,
-            }
-          : { ...e }
+        e.id === action.payload ? { ...e, isChecked: !e.isChecked } : { ...e }
       );
-
     case "SINGLE_REMOVED":
       if (currentState.length > 1) {
         return currentState.filter((e) => e.id !== action.payload);
       } else {
         return [{ ...emptyTask }];
       }
-
     default:
       return currentState;
   }
 };
 
-const Store = ({ children }: any) => {
-  const [taskListState, dispatch] = useReducer(reduce, [emptyTask]);
-  const [isAllChecked, setIsAllCheked] = useState(false);
-  const [isRemoveAllConfirm, setIsRemoveAllConfirm] = useState(false);
+export interface TodoContextType extends TodoState {
+  dispatch: React.Dispatch<TodoAction>;
+  setIsRemoveAllConfirm: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const taskListLenght = taskListState.length > 1;
+const TodoContext = createContext<TodoContextType | null>(null);
+
+interface TodoStoreProps {
+  children: ReactNode;
+}
+
+const Store = ({ children }: TodoStoreProps) => {
+  const [state, dispatch] = useReducer(reducer, [emptyTask]);
+  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
+  const [isRemoveAllConfirm, setIsRemoveAllConfirm] = useState<boolean>(false);
+
+  const taskListLength = state.length > 1;
 
   useEffect(() => {
-    const checkChecking = taskListState.some((e) => e.isChecked === false);
-    setIsAllCheked(!checkChecking);
-  }, [taskListState]);
+    const checkChecking = state.some((e) => !e.isChecked);
+    setIsAllChecked(!checkChecking);
+  }, [state]);
 
-  return (
-    <TodoContext.Provider
-      value={{
-        taskListState,
-        dispatch,
-        isAllChecked,
-        setIsRemoveAllConfirm,
-        isRemoveAllConfirm,
-        taskListLenght,
-      }}
-    >
-      {children}
-    </TodoContext.Provider>
-  );
+  const value: TodoContextType = {
+    taskListState: state,
+    isAllChecked,
+    isRemoveAllConfirm,
+    taskListLength,
+    dispatch,
+    setIsRemoveAllConfirm,
+  };
+
+  return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
 };
 
 export default Store;
 
-export const TodoContextConsumer = () => {
-  return useContext(TodoContext);
+export const useTodoContextConsumer = () => {
+  const context = useContext(TodoContext);
+  if (!context) {
+    throw new Error("useTodoContext must be used within a TodoProvider");
+  }
+  return context;
 };
