@@ -157,6 +157,10 @@ p {
   min-width: 70%;
 }
 
+.task p {
+  font-size: 20px;
+}
+
 .taskComplete {
   text-decoration-line: line-through;
 }

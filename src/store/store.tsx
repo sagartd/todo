@@ -37,6 +37,11 @@ const emptyTask: Task = {
   isTaskInputComplete: false,
 };
 
+const initialState = (): Task[] => {
+  const storedState = localStorage.getItem("todoState");
+  return storedState ? JSON.parse(storedState) : [emptyTask];
+};
+
 const reducer = (currentState: Task[], action: TodoAction): Task[] => {
   switch (action.type) {
     case "ADD_NEW_TASK":
@@ -87,15 +92,16 @@ interface TodoStoreProps {
 }
 
 const Store = ({ children }: TodoStoreProps) => {
-  const [state, dispatch] = useReducer(reducer, [emptyTask]);
+  const [state, dispatch] = useReducer(reducer, initialState());
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [isRemoveAllConfirm, setIsRemoveAllConfirm] = useState<boolean>(false);
 
   const taskListLength = state.length > 1;
 
   useEffect(() => {
-    const checkChecking = state.some((e) => !e.isChecked);
+    const checkChecking = state.some((e:Task) => !e.isChecked);
     setIsAllChecked(!checkChecking);
+    localStorage.setItem("todoState", JSON.stringify(state));
   }, [state]);
 
   const value: TodoContextType = {
